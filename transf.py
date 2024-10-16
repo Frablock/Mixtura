@@ -45,8 +45,10 @@ def transform(image_path, image_path_out):
 
     image.save(image_path_out)
 
+"""
 image_list = get_image_files("/home/user/Documents/Test_Cours/test_images")
 print(image_list)
 for img in image_list:
     print("transformation de "+img.split("/")[-1])
     transform(img, "./outputs/"+img.split("/")[-1])
+"""
