@@ -1,23 +1,36 @@
 # -*- coding: utf-8 -*-
 """
-Traitement automatisé d'image via l'usage d'un modèle de diffusion latente'
+Traitement automatisé d'image via l'usage d'un modèle de diffusion latente
 """
 
-from diffusers import StableDiffusionXLPipeline, StableDiffusionXLImg2ImgPipeline
 import torch
+from diffusers import StableDiffusionXLImg2ImgPipeline
 from diffusers.utils import load_image
 from PIL import Image
 import glob
+import json
+import os
 
+# Load config file
+with open("config.json", "r") as f:
+    config = json.load(f)
 
+# Load the model
 pipeline = StableDiffusionXLImg2ImgPipeline.from_single_file(
-    "/home/user/Documents/Stable Diffusion/stable-diffusion-webui/models/Stable-diffusion/monstercoffeecelsiusMix_v10.safetensors",
+    config['base_model'],
     torch_dtype=torch.float16
-).to("cuda")
+)
 
-pipeline.enable_model_cpu_offload()
+# Set the device (GPU if available, else CPU)
+device = "cuda" if torch.cuda.is_available() else "cpu"
+pipeline = pipeline.to(device)
+
+# Enable model offload if CUDA is available
+if device == "cuda":
+    pipeline.enable_model_cpu_offload()
 
 def resize_image(image, max_size=1024):
+    """Resize image while maintaining aspect ratio."""
     width, height = image.size
     if width > height:
         new_width = max_size
@@ -29,26 +42,45 @@ def resize_image(image, max_size=1024):
     return image.resize((new_width, new_height), Image.LANCZOS)
 
 def get_image_files(directory):
+    """Return all image files from the specified directory."""
     image_extensions = ['*.jpg', '*.jpeg', '*.png', '*.gif', '*.bmp', '*.webp', '*.avif']
     return [file for ext in image_extensions for file in glob.glob(f"{directory}/{ext}")]
 
 def transform(image_path, image_path_out):
+    """Transform an image using the Stable Diffusion pipeline."""
+    try:
+        init_image = load_image(image_path).convert("RGB")
 
-    init_image = load_image(image_path).convert("RGB")
+        init_image = resize_image(init_image, max_size=config["max_size"])
 
-    init_image = resize_image(init_image)
+        # Prompt and negative prompt from config
+        prompt = config["base_prompt"]
+        neg_prompt = config["neg_prompt"]
 
+        # Perform the transformation
+        image = pipeline(
+            prompt,
+            image=init_image,
+            strength=config["strength"],
+            negative_prompt=neg_prompt,
+            guidance_scale=7.5  # Optional for better control
+        ).images[0]
 
-    prompt = "Source_anime, anime style, score_9, score_8_up, score_7_up"
+        # Save the transformed image
+        os.makedirs(os.path.dirname(image_path_out), exist_ok=True)
+        image.save(image_path_out)
+        print(f"Image saved at {image_path_out}")
+        return True
 
-    image = pipeline(prompt, image=init_image, strength=0.4, negative_prompt="porn, nsfw, nude, suggestive, score_3, score_2, score_1, bad quality", sampler='euler-a').images[0] # guidance_scale = 5.0,
+    except Exception as e:
+        print(f"Error processing {image_path}: {e}")
+        return False
 
-    image.save(image_path_out)
-
+# Uncomment to process multiple images from a directory
 """
 image_list = get_image_files("/home/user/Documents/Test_Cours/test_images")
 print(image_list)
 for img in image_list:
-    print("transformation de "+img.split("/")[-1])
-    transform(img, "./outputs/"+img.split("/")[-1])
+    print(f"Transformation de {img.split('/')[-1]}")
+    transform(img, f"./outputs/{os.path.basename(img)}")
 """
