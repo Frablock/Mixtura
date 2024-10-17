@@ -1,0 +1,8 @@
+{
+    "model_name":"MonsterCoffeeCelsius",
+    "model_type":"pony",
+    "model_url":"https://civitai.com/api/download/models/697023?type=Model&format=SafeTensor&size=pruned&fp=fp16",
+    "tag":["anime"],
+    "hidden_prompt":"source_anime, anime style, score_9, score_8_up, score_7_up",
+    "hidden_neg_prompt":"porn, nsfw, nude, suggestive, score_3, score_2, score_1, bad quality"
+}

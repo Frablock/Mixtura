@@ -1,8 +1,8 @@
 {
     "base_model": "/home/user/Documents/Stable Diffusion/stable-diffusion-webui/models/Stable-diffusion/monstercoffeecelsiusMix_v10.safetensors",
-    "base_prompt": "Source_anime, anime style, score_9, score_8_up, score_7_up",
-    "neg_prompt":"porn, nsfw, nude, suggestive, score_3, score_2, score_1, bad quality",
-    "strength":0.4,
+    "base_prompt": ", (purple hair)",
+    "neg_prompt":"",
+    "strength":0.5,
     "sampler":"euler-a",
     "max_size":1024,
     "color_theme":"default"

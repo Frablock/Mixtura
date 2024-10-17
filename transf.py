@@ -25,6 +25,8 @@ pipeline = StableDiffusionXLImg2ImgPipeline.from_single_file(
 device = "cuda" if torch.cuda.is_available() else "cpu"
 pipeline = pipeline.to(device)
 
+pipeline.load_lora_weights("/home/user/Téléchargements/Flat_Vector_Art_PDXL-000007.safetensors", weight_name="Flat_Vector_Art_PDXL-000007.safetensors", adapter_name="vector") # https://civitai.com/api/download/models/488807?type=Model&format=SafeTensor
+
 # Enable model offload if CUDA is available
 if device == "cuda":
     pipeline.enable_model_cpu_offload()
@@ -55,6 +57,7 @@ def transform(image_path, image_path_out):
 
         # Prompt and negative prompt from config
         prompt = config["base_prompt"]
+        prompt = "(a flat style vector illustration, vztdzsxx,flat color, vector art, illustration, vector illustration, cel shading, simple coloring,)"
         neg_prompt = config["neg_prompt"]
 
         # Perform the transformation
@@ -63,7 +66,8 @@ def transform(image_path, image_path_out):
             image=init_image,
             strength=config["strength"],
             negative_prompt=neg_prompt,
-            guidance_scale=7.5  # Optional for better control
+            guidance_scale=7.5,  # Optional for better control
+            num_inference_steps=30
         ).images[0]
 
         # Save the transformed image
