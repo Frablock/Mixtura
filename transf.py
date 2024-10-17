@@ -25,7 +25,7 @@ pipeline = StableDiffusionXLImg2ImgPipeline.from_single_file(
 device = "cuda" if torch.cuda.is_available() else "cpu"
 pipeline = pipeline.to(device)
 
-pipeline.load_lora_weights("/home/user/Téléchargements/Flat_Vector_Art_PDXL-000007.safetensors", weight_name="Flat_Vector_Art_PDXL-000007.safetensors", adapter_name="vector") # https://civitai.com/api/download/models/488807?type=Model&format=SafeTensor
+#pipeline.load_lora_weights("/home/user/Téléchargements/Flat_Vector_Art_PDXL-000007.safetensors", weight_name="Flat_Vector_Art_PDXL-000007.safetensors", adapter_name="vector") # https://civitai.com/api/download/models/488807?type=Model&format=SafeTensor
 
 # Enable model offload if CUDA is available
 if device == "cuda":
