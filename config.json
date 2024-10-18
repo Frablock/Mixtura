@@ -1,9 +1,3 @@
 {
-    "base_model": "/home/user/Documents/Stable Diffusion/stable-diffusion-webui/models/Stable-diffusion/ponyRealism_v21MainVAE.safetensors",
-    "base_prompt": "",
-    "neg_prompt":"",
-    "strength":0.5,
-    "sampler":"euler-a",
     "max_size":1024,
-    "color_theme":"default"
 }

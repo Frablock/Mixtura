@@ -29,7 +29,6 @@ def change_pipeline(data):
         torch_dtype=torch.float16
     )
 
-    # Set the device (GPU if available, else CPU)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     pipeline = pipeline.to(device)
     current_model_data = data
@@ -42,7 +41,6 @@ if device == "cuda":
     pipeline.enable_model_cpu_offload()
 
 def resize_image(image, max_size=1024):
-    """Resize image while maintaining aspect ratio."""
     width, height = image.size
     if width > height:
         new_width = max_size
@@ -101,9 +99,9 @@ def inpaint(image_path, image_path_out, mask, prompt, neg_prompt, strength, mode
     print(currentPipeLineStr)
     try:
         init_image = load_image(image_path).convert("RGB")
-        init_image = resize_image(init_image, max_size=config["max_size"])[0]  # Resize image
+        init_image = resize_image(init_image, max_size=config["max_size"])[0]
 
-        init_mask = mask.convert("RGB").resize(init_image.size, Image.LANCZOS)  # Convert mask to RGB if needed
+        init_mask = mask.convert("RGB").resize(init_image.size, Image.LANCZOS)
 
         prompt = "(("+translate(current_model_data.get("hidden_prompt", "") + ")), " + prompt)
         neg_prompt = "(("+translate(current_model_data.get("hidden_neg_prompt", "") + ")), " + neg_prompt)
