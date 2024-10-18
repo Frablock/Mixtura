@@ -101,11 +101,11 @@ class InpaintingApp(QDialog):
 
             # Draw on mask
             draw = ImageDraw.Draw(self.mask_image)
-            x = current_point.x() / self.scale_factor
-            y = current_point.y() / self.scale_factor
+            x = current_point.x() - self.image_offset.x()/ self.scale_factor
+            y = current_point.y() - self.image_offset.y()/ self.scale_factor
 
             # Draw a circle on the mask (ellipse with equal width and height for a circle)
-            radius = 40 * 2  # Diameter of the circle
+            radius = 20*2  # Diameter of the circle
             draw.ellipse([
                 x - radius / 2, y - radius / 2,
                 x + radius / 2, y + radius / 2

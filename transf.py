@@ -23,10 +23,10 @@ with open("config.json", "r") as f:
     config = json.load(f)
 
 def change_pipeline(data):
-    print(data["model_url"])
+    print(os.path.abspath(mf.MODELS_PATHS+data["file"]))
     global pipeline, device, current_model_data
     pipeline = currentPipeLine.from_single_file(
-        data["model_url"],
+        data["model_url"],#os.path.abspath(mf.MODELS_PATHS+data["file"]),
         torch_dtype=torch.float16
     )
 
@@ -38,7 +38,7 @@ def change_pipeline(data):
 #pipeline.load_lora_weights("/home/user/Téléchargements/Flat_Vector_Art_PDXL-000007.safetensors", weight_name="Flat_Vector_Art_PDXL-000007.safetensors", adapter_name="vector") # https://civitai.com/api/download/models/488807?type=Model&format=SafeTensor
 
 # Load the model
-change_pipeline({"model_url":config['base_model']})
+change_pipeline(tuple(mf.models.values())[0])
 
 # Enable model offload if CUDA is available
 if device == "cuda":
@@ -53,6 +53,8 @@ def resize_image(image, max_size=1024):
     else:
         new_height = max_size
         new_width = int((new_height / height) * width)
+    new_width = (new_width // 8) * 8
+    new_height = (new_height // 8) * 8
 
     return image.resize((new_width, new_height), Image.LANCZOS), (new_height, new_width)
 
@@ -74,8 +76,8 @@ def transform(image_path, image_path_out, prompt, neg_prompt, strength, model):
         init_image = resize_image(init_image, max_size=config["max_size"])[0]
 
         # Prompt and negative prompt from config
-        prompt = translate(current_model_data.get("hidden_prompt","")+", "+prompt)
-        neg_prompt = translate(current_model_data.get("hidden_neg_prompt", "")+", "+neg_prompt)
+        prompt = "(("+translate(current_model_data.get("hidden_prompt","")+")), "+prompt)
+        neg_prompt = "(("+translate(current_model_data.get("hidden_neg_prompt", "")+")), "+neg_prompt)
 
         # Perform the transformation
         image = pipeline(
@@ -104,7 +106,7 @@ def inpaint(image_path, image_path_out, mask, prompt, neg_prompt, strength, mode
         currentPipeLineStr = "inpaint"
         currentPipeLine = StableDiffusionXLInpaintPipeline
         change_pipeline(mf.models[mf.getAllModelsNameAndTag()[model]])
-
+    print(currentPipeLineStr)
     try:
         # Load and resize the initial image
         init_image = load_image(image_path).convert("RGB")
@@ -112,12 +114,13 @@ def inpaint(image_path, image_path_out, mask, prompt, neg_prompt, strength, mode
         print(init_image.size)
 
         # Resize mask to the same size as the resized image
+        mask.show()
         init_mask = mask.convert("RGB").resize(init_image.size, Image.LANCZOS)  # Convert mask to RGB if needed
         print(init_mask.size)
 
         # Translate prompts
-        prompt = translate(current_model_data.get("hidden_prompt", "") + ", " + prompt)
-        neg_prompt = translate(current_model_data.get("hidden_neg_prompt", "") + ", " + neg_prompt)
+        prompt = "(("+translate(current_model_data.get("hidden_prompt", "") + ")), " + prompt)
+        neg_prompt = "(("+translate(current_model_data.get("hidden_neg_prompt", "") + ")), " + neg_prompt)
 
         # Perform the transformation
         image = pipeline(
@@ -131,7 +134,7 @@ def inpaint(image_path, image_path_out, mask, prompt, neg_prompt, strength, mode
             height=init_image.height,
             width=init_image.width
         ).images[0]
-
+        image.show()
         # Save the transformed image
         os.makedirs(os.path.dirname(image_path_out), exist_ok=True)
         image.save(image_path_out)
