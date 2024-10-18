@@ -1,16 +1,21 @@
 import sys, os, signal
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFileDialog, QHBoxLayout, QFrame, QPushButton, QSizePolicy, QTextEdit, QSlider, QComboBox
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFileDialog, QHBoxLayout, QFrame, QPushButton, QSizePolicy, QTextEdit, QSlider, QComboBox, QCheckBox
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QMovie
+from PyQt5.QtGui import QPixmap, QMovie, QImage
 
 from PIL import Image
 
 import transf
 import model_finder as mf
+import ui_inpainting as inp
+import more_windows as mw
+
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 LOADING_IMAGE = os.path.join(os.path.dirname(__file__), "reload-cat.gif")
 signal.signal(signal.SIGINT, signal.SIG_DFL) # Support du CTRL+C
 BASE_IMAGE = None
+MASK_IMAGE = None
 
 class ImageLabel(QLabel):
     def __init__(self):
@@ -71,10 +76,19 @@ class ImageLabel(QLabel):
         global BASE_IMAGE
         BASE_IMAGE = file_path
 
+        theApp.original_window.setPixmap(QPixmap(BASE_IMAGE))
+        theApp.original_window.show()
+        theApp.repaint()
+
         theApp.buttonInpainting.show()
+        theApp.buttonRedo.show()
 
         new_f = "./outputs/" + os.path.basename(file_path)
-        transf.transform(file_path, new_f, prompt1.toPlainText(), prompt2.toPlainText(), slider.value()/100)
+        if theApp.inpaint_window != None:
+            if theApp.inpaint_window.CheckUse.isChecked():
+                transf.inpaint(file_path, new_f, MASK_IMAGE, prompt1.toPlainText(), prompt2.toPlainText(), slider.value()/100, model=theApp.combo1.currentText())
+                return new_f
+        transf.transform(file_path, new_f, prompt1.toPlainText(), prompt2.toPlainText(), slider.value()/100, model=theApp.combo1.currentText())
         return new_f
 
 class App(QWidget):
@@ -220,7 +234,6 @@ class App(QWidget):
 
         self.buttonRedo = QPushButton("Traiter l'image")
         self.buttonRedo.clicked.connect(self.onRedoClicked)
-        quickSettingsframeLayout.addWidget(self.buttonRedo)
         self.buttonRedo.setStyleSheet('''
             QPushButton {
                 border: 2px solid rgba(255, 0, 0, 0.5);
@@ -254,6 +267,8 @@ class App(QWidget):
         self.buttonExtend.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Expanding vertically
         self.buttonExtend.clicked.connect(self.onExpandClicked)
 
+        self.buttonLayout = QHBoxLayout()
+
         self.buttonInpainting = QPushButton("Éditer une zone")
         self.buttonInpainting.setStyleSheet('''
             QPushButton {
@@ -269,10 +284,18 @@ class App(QWidget):
         # Ensure the button stays on top
         self.buttonInpainting.raise_()
         self.buttonInpainting.hide()
+        self.buttonRedo.hide()
+        self.buttonInpainting.clicked.connect(self.onInpaintClicked)
 
-        #self.buttonInpainting.clicked.connect(self.onInpaintClicked)
+        self.buttonLayout.addWidget(self.buttonRedo)
+        self.buttonLayout.addWidget(self.buttonInpainting)
 
-        frameLayout.addWidget(self.buttonInpainting)
+        frameLayout.addLayout(self.buttonLayout)
+
+        self.original_window = mw.OriginalWindow()
+        self.original_window.hide()
+
+        self.inpaint_window = None
 
         # Adding the frame and button into the main layout
         mainLayout.addWidget(self.quickSettingsframe)
@@ -280,6 +303,17 @@ class App(QWidget):
         mainLayout.addWidget(frame)
 
         self.setLayout(mainLayout)
+    def onInpaintClicked(self):
+        global MASK_IMAGE
+        inpaintingWindow = inp.InpaintingApp(BASE_IMAGE)
+        inpaintingWindow.exec_()
+
+        MASK_IMAGE = inpaintingWindow.mask_image
+        self.inpaint_window = mw.InpaintWindow()
+        self.inpaint_window.show()
+
+        self.inpaint_window.labelInpaint.setPixmap(inpaintingWindow.display_pixmap)
+        self.inpaint_window.CheckUse.setChecked(True)
 
     def onExpandClicked(self):
         if self.isExtended:
@@ -344,6 +378,7 @@ class App(QWidget):
         self.photoViewer.setLoadingAnimation()
         new_f = self.photoViewer.transform_image(file_path)
         self.photoViewer.setPixmap(QPixmap(new_f))
+
 
 
 if __name__ == '__main__':
