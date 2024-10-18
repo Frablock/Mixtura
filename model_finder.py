@@ -1,7 +1,6 @@
 import json
 import glob
 import os
-from urllib.request import urlretrieve
 
 MODELS_PATHS = "./models/"
 models={}
