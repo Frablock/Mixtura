@@ -103,7 +103,6 @@ def inpaint(image_path, image_path_out, mask, prompt, neg_prompt, strength, mode
         init_image = load_image(image_path).convert("RGB")
         init_image = resize_image(init_image, max_size=config["max_size"])[0]  # Resize image
 
-        mask.show()
         init_mask = mask.convert("RGB").resize(init_image.size, Image.LANCZOS)  # Convert mask to RGB if needed
 
         prompt = "(("+translate(current_model_data.get("hidden_prompt", "") + ")), " + prompt)
@@ -120,7 +119,6 @@ def inpaint(image_path, image_path_out, mask, prompt, neg_prompt, strength, mode
             height=init_image.height,
             width=init_image.width
         ).images[0]
-        image.show()
 
         os.makedirs(os.path.dirname(image_path_out), exist_ok=True)
         image.save(image_path_out)

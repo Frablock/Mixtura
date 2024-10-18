@@ -215,6 +215,7 @@ class App(QWidget):
         self.combo1.currentTextChanged.connect(self.on_combobox1_changed)
 
 
+        """
         label6 = QLabel(self)
         label6.setText("Souhaitez-vous utiliser un sous-style ?")
         quickSettingsframeLayout.addWidget(label6)
@@ -229,6 +230,7 @@ class App(QWidget):
         ''')
         self.combo2.addItem("Non")
         self.combo2.addItem("Non-")
+        """
 
         self.buttonRedo = QPushButton("Traiter l'image")
         self.buttonRedo.clicked.connect(self.onRedoClicked)
