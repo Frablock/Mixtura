@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFileDia
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QMovie
 
+from PIL import Image
+
 import transf
 import model_finder as mf
 
@@ -22,6 +24,9 @@ class ImageLabel(QLabel):
             }
         ''')
         self.movie = None  # To hold the loading animation
+        self.pixmap_image = None
+        self.fi_size = self.size()
+        print("c",self.size())
 
     def setLoadingAnimation(self):
         if os.path.exists(LOADING_IMAGE):
@@ -39,7 +44,17 @@ class ImageLabel(QLabel):
 
     def setPixmap(self, image):
         self.clearLoadingAnimation()
-        super().setPixmap(image)
+        self.pixmap_image = image
+
+        scaled_pixmap = image.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        super().setPixmap(scaled_pixmap)
+        self.fi_size = self.size()
+
+    def updatePixmap(self):
+        # Scale the image to fit the label size while keeping its aspect ratio
+        scaled_pixmap = self.pixmap_image.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        super().setPixmap(scaled_pixmap)
+        self.fi_size = self.size()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -56,15 +71,27 @@ class ImageLabel(QLabel):
         global BASE_IMAGE
         BASE_IMAGE = file_path
 
+        theApp.buttonInpainting.show()
+
         new_f = "./outputs/" + os.path.basename(file_path)
         transf.transform(file_path, new_f, prompt1.toPlainText(), prompt2.toPlainText(), slider.value()/100)
         return new_f
 
 class App(QWidget):
     def __init__(self):
-        global prompt1, prompt2, slider
+        global prompt1, prompt2, slider, width, height
         super().__init__()
-        self.resize(600, 600)
+
+        screen = QApplication.primaryScreen()
+        screen_size = screen.availableGeometry()  # Available geometry excluding the taskbar
+
+        width = screen_size.width()
+        height = screen_size.height()
+        # self.resize(width, height) # resize fullscreen
+        # self.setGeometry(100, 100, 800, 600)
+        self.resize(800,600)
+        #self.setFixedSize(self.size())
+
         self.setWindowTitle("Mixtura")
         self.setAcceptDrops(True)
 
@@ -227,6 +254,26 @@ class App(QWidget):
         self.buttonExtend.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Expanding vertically
         self.buttonExtend.clicked.connect(self.onExpandClicked)
 
+        self.buttonInpainting = QPushButton("Éditer une zone")
+        self.buttonInpainting.setStyleSheet('''
+            QPushButton {
+                border: 2px solid rgba(255, 0, 0, 0.5);
+                border-radius: 5px;
+            }
+        ''')
+
+        # Position the button to the bottom-right corner
+        self.buttonInpainting.resize(120, 40)  # Size of the button
+        self.buttonInpainting.move(self.width() - self.buttonInpainting.width() - 10, self.height() - self.buttonInpainting.height() - 10)
+
+        # Ensure the button stays on top
+        self.buttonInpainting.raise_()
+        self.buttonInpainting.hide()
+
+        #self.buttonInpainting.clicked.connect(self.onInpaintClicked)
+
+        frameLayout.addWidget(self.buttonInpainting)
+
         # Adding the frame and button into the main layout
         mainLayout.addWidget(self.quickSettingsframe)
         mainLayout.addWidget(self.buttonExtend)
@@ -301,6 +348,6 @@ class App(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    demo = App()
-    demo.show()
+    theApp = App()
+    theApp.show()
     sys.exit(app.exec_())
