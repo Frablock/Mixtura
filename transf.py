@@ -13,21 +13,29 @@ import os
 
 from translation import translate
 
+current_model_data ={}
+
 # Load config file
 with open("config.json", "r") as f:
     config = json.load(f)
 
-# Load the model
-pipeline = StableDiffusionXLImg2ImgPipeline.from_single_file(
-    config['base_model'],
-    torch_dtype=torch.float16
-)
+def change_pipeline(data):
+    print(data["model_url"])
+    global pipeline, device, current_model_data
+    pipeline = StableDiffusionXLImg2ImgPipeline.from_single_file(
+        data["model_url"],
+        torch_dtype=torch.float16
+    )
 
-# Set the device (GPU if available, else CPU)
-device = "cuda" if torch.cuda.is_available() else "cpu"
-pipeline = pipeline.to(device)
+    # Set the device (GPU if available, else CPU)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    pipeline = pipeline.to(device)
+    current_model_data = data
 
 #pipeline.load_lora_weights("/home/user/Téléchargements/Flat_Vector_Art_PDXL-000007.safetensors", weight_name="Flat_Vector_Art_PDXL-000007.safetensors", adapter_name="vector") # https://civitai.com/api/download/models/488807?type=Model&format=SafeTensor
+
+# Load the model
+change_pipeline({"model_url":config['base_model']})
 
 # Enable model offload if CUDA is available
 if device == "cuda":
@@ -59,8 +67,8 @@ def transform(image_path, image_path_out, prompt, neg_prompt, strength):
         init_image = resize_image(init_image, max_size=config["max_size"])
 
         # Prompt and negative prompt from config
-        prompt = translate(config["base_prompt"]+", "+prompt)
-        neg_prompt = translate(config["neg_prompt"]+", "+neg_prompt)
+        prompt = translate(current_model_data.get("hidden_prompt","")+", "+prompt)
+        neg_prompt = translate(current_model_data.get("hidden_neg_prompt", "")+", "+neg_prompt)
 
         print(prompt, neg_prompt, strength)
 
@@ -70,7 +78,7 @@ def transform(image_path, image_path_out, prompt, neg_prompt, strength):
             image=init_image,
             strength=strength,
             negative_prompt=neg_prompt,
-            guidance_scale=7.5,  # Optional for better control
+            guidance_scale=6.4,#7.5,  # Optional for better control
             num_inference_steps=30
         ).images[0]
 

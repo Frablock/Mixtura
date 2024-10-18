@@ -1,0 +1,13 @@
+{
+    "model_name":"AlbedoXL",
+    "model_type":"sdxl",
+    "model_url":"/home/user/Documents/Stable Diffusion/stable-diffusion-webui/models/Stable-diffusion/albedobaseXL_v21.safetensors",
+    "tag":["Realism"],
+    "hidden_prompt":"hyperdetailed analog photo, highly detailed, high contrast",
+    "hidden_neg_prompt":"bad anatomy, closed eyes, extra limb, missing limb, disembodied limb, oversized limbs, bad hands, bad face, unreal, fake, blur, blurry, out of focus, out of fram, low quality, mess, porn, nude, suggestive",
+    "recommanded_settings": {
+        "sampler":"euler-a",
+        "steps":30,
+        "guidance":6.4
+    }
+}

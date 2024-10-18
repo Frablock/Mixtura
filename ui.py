@@ -3,10 +3,12 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFileDia
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QMovie
 
-import transf  # Make sure this module exists and works properly
+import transf
+import model_finder as mf
 
 LOADING_IMAGE = os.path.join(os.path.dirname(__file__), "reload-cat.gif")
 signal.signal(signal.SIGINT, signal.SIG_DFL) # Support du CTRL+C
+BASE_IMAGE = None
 
 class ImageLabel(QLabel):
     def __init__(self):
@@ -50,6 +52,9 @@ class ImageLabel(QLabel):
     def transform_image(self, file_path):
         if not os.path.exists("./outputs"):
             os.makedirs("./outputs")
+
+        global BASE_IMAGE
+        BASE_IMAGE = file_path
 
         new_f = "./outputs/" + os.path.basename(file_path)
         transf.transform(file_path, new_f, prompt1.toPlainText(), prompt2.toPlainText(), slider.value()/100)
@@ -165,6 +170,10 @@ class App(QWidget):
             }
         ''')
         quickSettingsframeLayout.addWidget(self.combo1)
+        for ele in mf.getAllModelsNameAndTag():
+            self.combo1.addItem(ele)
+
+        self.combo1.currentTextChanged.connect(self.on_combobox1_changed)
 
 
         label6 = QLabel(self)
@@ -181,6 +190,16 @@ class App(QWidget):
         ''')
         self.combo2.addItem("Non")
         self.combo2.addItem("Non-")
+
+        self.buttonRedo = QPushButton("Traiter l'image")
+        self.buttonRedo.clicked.connect(self.onRedoClicked)
+        quickSettingsframeLayout.addWidget(self.buttonRedo)
+        self.buttonRedo.setStyleSheet('''
+            QPushButton {
+                border: 2px solid rgba(255, 0, 0, 0.5);
+                border-radius: 5px;
+            }
+        ''')
 
 
 
@@ -224,6 +243,13 @@ class App(QWidget):
             self.quickSettingsframe.show()
             self.isExtended = True
             self.buttonExtend.setText("ᐳ")
+
+    def onRedoClicked(self):
+        if BASE_IMAGE != None:
+            self.set_image(BASE_IMAGE)
+
+    def on_combobox1_changed(self, value):
+        transf.change_pipeline(mf.models[mf.getAllModelsNameAndTag()[value]])
 
     def process_images_in_folder(self, folder_path):
         """Process all image files in the selected folder."""
