@@ -52,13 +52,15 @@ class ImageLabel(QLabel):
             os.makedirs("./outputs")
 
         new_f = "./outputs/" + os.path.basename(file_path)
-        transf.transform(file_path, new_f)
+        transf.transform(file_path, new_f, prompt1.toPlainText(), prompt2.toPlainText(), slider.value()/100)
         return new_f
 
 class App(QWidget):
     def __init__(self):
+        global prompt1, prompt2, slider
         super().__init__()
         self.resize(600, 600)
+        self.setWindowTitle("Mixtura")
         self.setAcceptDrops(True)
 
         self.isExtended = False

@@ -1,6 +1,6 @@
 {
-    "base_model": "/home/user/Documents/Stable Diffusion/stable-diffusion-webui/models/Stable-diffusion/monstercoffeecelsiusMix_v10.safetensors",
-    "base_prompt": ", (purple hair)",
+    "base_model": "/home/user/Documents/Stable Diffusion/stable-diffusion-webui/models/Stable-diffusion/ponyRealism_v21MainVAE.safetensors",
+    "base_prompt": "",
     "neg_prompt":"",
     "strength":0.5,
     "sampler":"euler-a",

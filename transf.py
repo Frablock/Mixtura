@@ -11,6 +11,8 @@ import glob
 import json
 import os
 
+from translation import translate
+
 # Load config file
 with open("config.json", "r") as f:
     config = json.load(f)
@@ -48,23 +50,25 @@ def get_image_files(directory):
     image_extensions = ['*.jpg', '*.jpeg', '*.png', '*.gif', '*.bmp', '*.webp', '*.avif']
     return [file for ext in image_extensions for file in glob.glob(f"{directory}/{ext}")]
 
-def transform(image_path, image_path_out):
+def transform(image_path, image_path_out, prompt, neg_prompt, strength):
     """Transform an image using the Stable Diffusion pipeline."""
+    print(prompt, neg_prompt, strength)
     try:
         init_image = load_image(image_path).convert("RGB")
 
         init_image = resize_image(init_image, max_size=config["max_size"])
 
         # Prompt and negative prompt from config
-        prompt = config["base_prompt"]
-        prompt = "(a flat style vector illustration, vztdzsxx,flat color, vector art, illustration, vector illustration, cel shading, simple coloring,)"
-        neg_prompt = config["neg_prompt"]
+        prompt = translate(config["base_prompt"]+", "+prompt)
+        neg_prompt = translate(config["neg_prompt"]+", "+neg_prompt)
+
+        print(prompt, neg_prompt, strength)
 
         # Perform the transformation
         image = pipeline(
             prompt,
             image=init_image,
-            strength=config["strength"],
+            strength=strength,
             negative_prompt=neg_prompt,
             guidance_scale=7.5,  # Optional for better control
             num_inference_steps=30
