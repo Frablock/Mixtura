@@ -28,7 +28,7 @@ class ImageLabel(QLabel):
                 border: 4px dashed #d62828
             }
         ''')
-        self.movie = None  # To hold the loading animation
+        self.movie = None  # Maintient anim chargement
         self.pixmap_image = None
         self.fi_size = self.size()
         print("c",self.size())
@@ -56,7 +56,7 @@ class ImageLabel(QLabel):
         self.fi_size = self.size()
 
     def updatePixmap(self):
-        # Scale the image to fit the label size while keeping its aspect ratio
+        # Redimention des images en conservant le ratio
         scaled_pixmap = self.pixmap_image.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
         super().setPixmap(scaled_pixmap)
         self.fi_size = self.size()
@@ -97,22 +97,20 @@ class App(QWidget):
         super().__init__()
 
         screen = QApplication.primaryScreen()
-        screen_size = screen.availableGeometry()  # Available geometry excluding the taskbar
+        screen_size = screen.availableGeometry()
 
         width = screen_size.width()
         height = screen_size.height()
-        # self.resize(width, height) # resize fullscreen
-        # self.setGeometry(100, 100, 800, 600)
+        # self.resize(width, height) # fullscreen
         self.resize(800,600)
-        #self.setFixedSize(self.size())
+        #self.setFixedSize(self.size()) # blockage plein écran
 
         self.setWindowTitle("Mixtura")
         self.setAcceptDrops(True)
 
         self.isExtended = False
 
-        # Main Layout: Adjust to custom schema (modify if necessary)
-        mainLayout = QHBoxLayout()  # Using QHBoxLayout to organize elements horizontally
+        mainLayout = QHBoxLayout()
         self.setStyleSheet("background-color: #1e1616;")
 
         frame = QFrame(self)
@@ -194,9 +192,9 @@ class App(QWidget):
         ''')
 
 
-        slider.setRange(0, 100)  # Set range from 0 to 100
-        slider.setValue(50)     # Set initial value to 50
-        slider.setSingleStep(5) # Set single step size to 0.01
+        slider.setRange(0, 100)
+        slider.setValue(50)
+        slider.setSingleStep(5)
         quickSettingsframeLayout.addWidget(slider)
 
         label5 = QLabel(self)
@@ -248,7 +246,7 @@ class App(QWidget):
         frameLayout.addWidget(self.photoViewer)
         frame.setStyleSheet('border: 0px solid #ccc;')
 
-        # Create a vertical button to place next to the photoViewer
+        # Le bouton vertical permettant d'afficher/cacher le menu
         self.buttonExtend = QPushButton("ᐸ")
         self.buttonExtend.setStyleSheet('''
             QPushButton {
@@ -263,8 +261,8 @@ class App(QWidget):
             }
         ''')
 
-        # Make the button fill the vertical space
-        self.buttonExtend.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Expanding vertically
+        # On étends le bouton
+        self.buttonExtend.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)  # Expension verticale
         self.buttonExtend.clicked.connect(self.onExpandClicked)
 
         self.buttonLayout = QHBoxLayout()
@@ -277,12 +275,6 @@ class App(QWidget):
             }
         ''')
 
-        # Position the button to the bottom-right corner
-        self.buttonInpainting.resize(120, 40)  # Size of the button
-        self.buttonInpainting.move(self.width() - self.buttonInpainting.width() - 10, self.height() - self.buttonInpainting.height() - 10)
-
-        # Ensure the button stays on top
-        self.buttonInpainting.raise_()
         self.buttonInpainting.hide()
         self.buttonRedo.hide()
         self.buttonInpainting.clicked.connect(self.onInpaintClicked)
@@ -297,7 +289,6 @@ class App(QWidget):
 
         self.inpaint_window = None
 
-        # Adding the frame and button into the main layout
         mainLayout.addWidget(self.quickSettingsframe)
         mainLayout.addWidget(self.buttonExtend)
         mainLayout.addWidget(frame)
@@ -333,14 +324,13 @@ class App(QWidget):
         transf.change_pipeline(mf.models[mf.getAllModelsNameAndTag()[value]])
 
     def process_images_in_folder(self, folder_path):
-        """Process all image files in the selected folder."""
         supported_formats = ('.png', '.xpm', '.jpg', '.jpeg', '.bmp')
         for file_name in os.listdir(folder_path):
-            self.photoViewer.setLoadingAnimation()  # Set loading animation
+            self.photoViewer.setLoadingAnimation()
             if file_name.lower().endswith(supported_formats):
                 file_path = os.path.join(folder_path, file_name)
-                new_f = self.photoViewer.transform_image(file_path)  # Process image
-                self.photoViewer.setPixmap(QPixmap(new_f))  # Display processed image
+                new_f = self.photoViewer.transform_image(file_path)
+                self.photoViewer.setPixmap(QPixmap(new_f))
                 self.repaint()
 
     def dragEnterEvent(self, event):

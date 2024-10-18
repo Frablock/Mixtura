@@ -1,16 +1,15 @@
 import json
 import glob
 import os
+from urllib.request import urlretrieve
 
-MODELS_PATHS = "./models"
+MODELS_PATHS = "./models/"
 models={}
 models_name_and_tag = {}
 
 def loadModels():
-    # Find all JSON files in the folder
     json_files = glob.glob(os.path.join(MODELS_PATHS, '*.json'))
 
-    # Process each JSON file
     for file in json_files:
         with open(file, 'r') as json_file:
             data = json.load(json_file)

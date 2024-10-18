@@ -14,12 +14,10 @@ class InpaintingApp(QDialog):
         self.setGeometry(100, 100, 800, 600)
         self.setFixedSize(self.size())
 
-        # Create main widget and layout
-        self.layout = QVBoxLayout()  # Initialize layout with central_widget
+        self.layout = QVBoxLayout()
 
         self.setStyleSheet("background-color: #1e1616;")
 
-        # QLabel to show the image
         self.image_label = QLabel(self)
         self.image_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.image_label)
@@ -34,16 +32,14 @@ class InpaintingApp(QDialog):
         ''')
 
         self.layout.addWidget(self.inpaint_button)
-        self.setLayout(self.layout)  # Set the layout for the QDialog
+        self.setLayout(self.layout)
 
-        # Variables to hold the image and mask
         self.original_image = None
         self.mask_image = None
         self.display_pixmap = None
         self.scale_factor = 1.0
         self.image_offset = QPoint(0, 0)
 
-        # Graphics for drawing mask
         self.drawing = False
         self.last_point = QPoint()
 
@@ -68,14 +64,12 @@ class InpaintingApp(QDialog):
         q_image = self.pil_to_qimage(image)
         pixmap = QPixmap.fromImage(q_image)
 
-        # Scale the image to fit the label, stretching it
         self.display_pixmap = pixmap.scaled(self.image_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.image_label.setPixmap(self.display_pixmap)
         self.image_offset = QPoint((self.image_label.width() - self.display_pixmap.width()) // 2,
                                    (self.image_label.height() - self.display_pixmap.height()) // 2)
 
     def resizeEvent(self, event):
-        # Handle resizing the image when the window is resized
         if self.original_image is not None:
             self.show_image(self.original_image)
         super().resizeEvent(event)
@@ -89,23 +83,20 @@ class InpaintingApp(QDialog):
         if self.drawing and self.display_pixmap:
             current_point = self.get_image_coordinates(event.pos())
 
-            # Draw on display pixmap
             painter = QPainter(self.display_pixmap)
             painter.setPen(QPen(Qt.red, 10, Qt.SolidLine))
 
-            # Draw a circle instead of a line
-            radius = 10  # Radius of the circle
+            radius = 10
             painter.drawEllipse(current_point - self.image_offset,  radius, radius)
             painter.end()
             self.image_label.setPixmap(self.display_pixmap)
 
-            # Draw on mask
             draw = ImageDraw.Draw(self.mask_image)
             x = current_point.x() - self.image_offset.x()/ self.scale_factor
             y = current_point.y() - self.image_offset.y()/ self.scale_factor
 
-            # Draw a circle on the mask (ellipse with equal width and height for a circle)
-            radius = 20*2  # Diameter of the circle
+
+            radius = 20*2
             draw.ellipse([
                 x - radius / 2, y - radius / 2,
                 x + radius / 2, y + radius / 2
