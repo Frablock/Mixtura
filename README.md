@@ -16,3 +16,4 @@ That's why Mixtura was created, to provide an image-modification tool that respe
 
 ![UI](https://i.ibb.co/jzLCyBy/Copie-d-cran-20241019-030519.png)
 
+![Exemple](https://github.com/Frablock/Mixtura/raw/main/outputs/Hatsune.Miku.jpg)
