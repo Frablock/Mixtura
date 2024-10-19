@@ -2,6 +2,7 @@
 [![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff)](#)
 [![Powered By PyTorch](https://img.shields.io/badge/Powered%20by-PyTorch-ee4c2c.svg)](https://pytorch.org)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+[![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
 It is clear that artificial intelligence will play a fundamental role in the generation and modification of content, radically transforming the way we create, consume and interact with content. Whether it's text, images, video or even music, AI is already automating previously complex processes, while opening up new creative possibilities.
 
