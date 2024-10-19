@@ -4,6 +4,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QMovie, QImage
 
 from PIL import Image
+from datetime import datetime
+
 
 import transf
 import model_finder as mf
@@ -83,7 +85,7 @@ class ImageLabel(QLabel):
         theApp.buttonInpainting.show()
         theApp.buttonRedo.show()
 
-        new_f = "./outputs/" + os.path.basename(file_path)
+        new_f = "./outputs/"+ str(datetime.now()) + os.path.basename(file_path)
         if theApp.inpaint_window != None:
             if theApp.inpaint_window.CheckUse.isChecked():
                 transf.inpaint(file_path, new_f, MASK_IMAGE, prompt1.toPlainText(), prompt2.toPlainText(), slider.value()/100, model=theApp.combo1.currentText())
