@@ -68,6 +68,8 @@ class InpaintingApp(QDialog):
         self.image_label.setPixmap(self.display_pixmap)
         self.image_offset = QPoint((self.image_label.width() - self.display_pixmap.width()) // 2,
                                    (self.image_label.height() - self.display_pixmap.height()) // 2)
+        self.scale_factor = min(self.image_label.width() / pixmap.width(),
+                                self.image_label.height() / pixmap.height())
 
     def resizeEvent(self, event):
         if self.original_image is not None:
@@ -92,8 +94,8 @@ class InpaintingApp(QDialog):
             self.image_label.setPixmap(self.display_pixmap)
 
             draw = ImageDraw.Draw(self.mask_image)
-            x = current_point.x() - self.image_offset.x()/ self.scale_factor
-            y = current_point.y() - self.image_offset.y()/ self.scale_factor
+            x = (current_point.x() - self.image_offset.x()) / self.scale_factor
+            y = (current_point.y() - self.image_offset.y()) / self.scale_factor
 
 
             radius = 20*2
