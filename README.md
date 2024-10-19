@@ -1,4 +1,6 @@
 # Mixtura
+![Static Badge](https://img.shields.io/badge/:badgeContent?style=for-the-badge&label=Powered%20by%20PyTorch)
+
  
 It is clear that artificial intelligence will play a fundamental role in the generation and modification of content, radically transforming the way we create, consume and interact with content. Whether it's text, images, video or even music, AI is already automating previously complex processes, while opening up new creative possibilities.
 
