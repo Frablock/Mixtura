@@ -1,6 +1,7 @@
 # Mixtura
-![Static Badge](https://img.shields.io/badge/Powered%20by%20PyTorch?style=flat)
- 
+[![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff)](#)
+[![Powered By PyTorch](https://img.shields.io/badge/Powered%20by-PyTorch-ee4c2c.svg)](https://pytorch.org)
+
 It is clear that artificial intelligence will play a fundamental role in the generation and modification of content, radically transforming the way we create, consume and interact with content. Whether it's text, images, video or even music, AI is already automating previously complex processes, while opening up new creative possibilities.
 
 However, for many users, using AI can be complex. *"How do I do it? What should I do? I don't understand a thing! It's far too complex for me"*, these are some of the answers from people close to me when I asked them about their use of AI.
