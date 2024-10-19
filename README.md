@@ -9,3 +9,5 @@ It is clear today that we are witnessing a growing digital divide between those 
 One of the main obstacles to the mass adoption of these technologies is therefore the perceived complexity, but also mistrust of the conditions of use and ethical implications that these tools raise, not to mention financial reasons. Many users are reluctant to start using artificial intelligence for fear of losing control over their creation or having their privacy compromised. Questions around intellectual property, data confidentiality and the possibility of large companies exploiting works created using these tools are all obstacles to their democratisation.
 
 That's why Mixtura was created, to provide an image-modification tool that respects users, their level of knowledge, their wallets and their private lives.
+
+![https://i.ibb.co/jzLCyBy/Copie-d-cran-20241019-030519.png](UI)
